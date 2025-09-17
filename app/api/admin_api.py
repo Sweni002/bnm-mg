@@ -71,3 +71,39 @@ def delete_admin(admin_id: int, db: Session = Depends(get_db)):
         data={"id": db_admin.id, "username": db_admin.username, "email": db_admin.email},
         message="Admin supprimé avec succès"
     )
+
+
+@router.put("/{admin_id}")
+def update_admin(admin_id: int, admin: AdminCreate, db: Session = Depends(get_db)):
+    db_admin = db.query(Admin).filter(Admin.id == admin_id).first()
+    if not db_admin:
+        return error_response(message="Admin non trouvé", status_code=404)
+
+    # Vérifier que le username n'est pas déjà utilisé par un autre admin
+    if admin.username:
+        existing_username = db.query(Admin).filter(Admin.username == admin.username, Admin.id != admin_id).first()
+        if existing_username:
+            return error_response(message="Username déjà utilisé", status_code=400)
+        db_admin.username = admin.username
+
+    # Vérifier que l'email n'est pas déjà utilisé par un autre admin
+    if admin.email:
+        existing_email = db.query(Admin).filter(Admin.email == admin.email, Admin.id != admin_id).first()
+        if existing_email:
+            return error_response(message="Email déjà utilisé", status_code=400)
+        db_admin.email = admin.email
+
+    # Mettre à jour le mot de passe si fourni
+    if admin.password:
+        db_admin.hashed_password = pwd_context.hash(admin.password)
+
+    try:
+        db.commit()
+        db.refresh(db_admin)
+        return success_response(
+            data={"id": db_admin.id, "username": db_admin.username, "email": db_admin.email},
+            message="Admin mis à jour avec succès"
+        )
+    except Exception as e:
+        db.rollback()
+        return error_response(message=f"Erreur serveur: {e}", status_code=500)
