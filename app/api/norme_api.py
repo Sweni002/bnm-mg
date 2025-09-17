@@ -9,6 +9,7 @@ from app.models.secteur import Secteur
 from app.config.database import SessionLocal
 from app.utils.response import success_response, error_response
 from datetime import datetime, date
+from fastapi.responses  import FileResponse
 
 router = APIRouter(prefix="/normes", tags=["Normes"])
 
@@ -190,4 +191,22 @@ async def update_norme(
             "secteur": {"id": db_norme.secteur.id, "nom": db_norme.secteur.nom} if db_norme.secteur else None
         },
         message="Norme mise à jour avec succès"
+    )
+    
+    
+@router.get("/{norme_id}/pdf")
+def view_norme_pdf(norme_id: int, db: Session = Depends(get_db)):
+    db_norme = db.query(Norme).filter(Norme.id == norme_id).first()
+    if not db_norme:
+        return error_response(message="Norme non trouvée", status_code=404)
+
+    pdf_path = Path(db_norme.fichier_pdf)
+    if not pdf_path.exists():
+        return error_response(message="Fichier PDF introuvable", status_code=404)
+
+    # FileResponse va afficher le PDF directement dans le navigateur
+    return FileResponse(
+        path=str(pdf_path),
+        media_type="application/pdf"
+        # pas de "filename" ici pour éviter le téléchargement automatique
     )

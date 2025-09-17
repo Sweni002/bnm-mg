@@ -64,3 +64,38 @@ def delete_client(client_id: int, db: Session = Depends(get_db)):
         data={"id": db_client.id, "username": db_client.username, "email": db_client.email},
         message="Client supprimé avec succès"
     )
+
+
+
+@router.put("/{client_id}")
+def update_client(client_id: int, client: ClientCreate, db: Session = Depends(get_db)):
+    db_client = db.query(Client).filter(Client.id == client_id).first()
+    if not db_client:
+        return error_response(message="Client non trouvé", status_code=404)
+
+    # Vérifier si le username existe pour un autre client
+    existing_username = db.query(Client).filter(Client.username == client.username, Client.id != client_id).first()
+    if existing_username:
+        return error_response(message="Username déjà utilisé", status_code=400)
+
+    # Vérifier si l'email existe pour un autre client
+    existing_email = db.query(Client).filter(Client.email == client.email, Client.id != client_id).first()
+    if existing_email:
+        return error_response(message="Email déjà utilisé", status_code=400)
+
+    # Mise à jour
+    db_client.username = client.username
+    db_client.email = client.email
+    db_client.hashed_password = pwd_context.hash(client.password)
+
+    db.commit()
+    db.refresh(db_client)
+
+    return success_response(
+        data={
+            "id": db_client.id,
+            "username": db_client.username,
+            "email": db_client.email
+        },
+        message="Client mis à jour avec succès"
+    )
