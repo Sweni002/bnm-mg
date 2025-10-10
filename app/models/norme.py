@@ -8,7 +8,8 @@ class Norme(Base):
     id = Column(Integer, primary_key=True, index=True)
     codification = Column(String(255), unique=True, nullable=False)
     nom = Column(String(200), nullable=False)
-    date_creation = Column(Date, nullable=False)
+    date_creation = Column(String(200), nullable=False)
+    nbrepage = Column(Integer, nullable=False)  # <-- nouvelle colonne
 
     # chemin du fichier PDF
     fichier_pdf = Column(String(255), nullable=False)

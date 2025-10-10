@@ -4,7 +4,8 @@ from datetime import date
 class NormeBase(BaseModel):
     codification: str
     nom: str
-    date_creation: date
+    nbrepage: int
+    date_creation: str
     fichier_pdf: str
     secteur_id: int
 

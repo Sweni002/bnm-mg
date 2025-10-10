@@ -33,7 +33,7 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
 
     # Vérification du mot de passe
     if not user or not user.verify_password(request.password):
-        return error_response(message="Nom d'utilisateur ou mot de passe incorrect", status_code=401)
+        return error_response(message="Identifiants invalide", status_code=401)
 
     # Générer le token
     access_token = create_access_token(data={"sub": user.username, "role": role})

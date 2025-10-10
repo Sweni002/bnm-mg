@@ -50,6 +50,13 @@ def read_secteurs(db: Session = Depends(get_db)):
     return success_response(data=data)
 
 
+@router.get("/counts")
+def count_secteurs(db: Session = Depends(get_db)):
+    """Retourne le nombre total de secteurs"""
+    total = db.query(Secteur).count()
+    return success_response(data={"total_secteurs": total})
+
+
 # ----------------- Lire un Secteur -----------------
 @router.get("/{secteur_id}")
 def read_secteur(secteur_id: int, db: Session = Depends(get_db)):
@@ -76,7 +83,6 @@ def delete_secteur(secteur_id: int, db: Session = Depends(get_db)):
         data={"id": db_secteur.id, "nom": db_secteur.nom},
         message="Secteur supprimé avec succès"
     )
-
 
 
 @router.put("/{secteur_id}")
