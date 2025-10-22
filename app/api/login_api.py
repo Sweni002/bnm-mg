@@ -26,10 +26,30 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(Admin).filter(Admin.username == request.username).first()
     role = "admin"
 
-    # Si pas trouvé, chercher dans Client
-    if not user:
-        user = db.query(Client).filter(Client.username == request.username).first()
-        role = "client"
+      # Vérification du mot de passe
+    if not user or not user.verify_password(request.password):
+        return error_response(message="Identifiants invalide", status_code=401)
+
+    # Générer le token
+    access_token = create_access_token(data={"sub": user.username, "role": role})
+
+    return success_response(
+        data={
+            "access_token": access_token,
+            "token_type": "bearer",
+            "role": role
+        } ,
+             message="Authentification  avec succès"
+    )
+
+
+@router.post("/login_client")
+def login_client(request: LoginRequest, db: Session = Depends(get_db)):
+  
+   
+  
+    user = db.query(Client).filter(Client.username == request.username).first()
+    role = "client"
 
     # Vérification du mot de passe
     if not user or not user.verify_password(request.password):

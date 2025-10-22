@@ -23,6 +23,8 @@ def get_db():
 def create_client(client: ClientCreate, db: Session = Depends(get_db)):
     db_client = Client(username=client.username, email=client.email)
     db_client.hashed_password = pwd_context.hash(client.password)
+    print("Reçu côté serveur:", client.dict())  # debug
+
     try:
         db.add(db_client)
         db.commit()

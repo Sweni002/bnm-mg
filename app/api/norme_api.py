@@ -198,6 +198,7 @@ def read_normes_by_secteur(secteur_id: int, db: Session = Depends(get_db)):
             "id": n.id,
             "codification": n.codification,
             "nom": n.nom,
+            'nbrepage': n.nbrepage ,
             "date_creation": n.date_creation ,
             "fichier_pdf": n.fichier_pdf,
             "secteur": {
