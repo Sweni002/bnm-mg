@@ -21,8 +21,8 @@ app = FastAPI(title="Gestion des Normes à Madagascar")
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-      "http://127.0.0.1:5174",   # ← ajouté
-    "http://192.168.10.31:5173"
+      "http://127.0.0.1:3000",   # ← ajouté
+    "http://192.168.10.31:3000"
 ]
 
 app.add_middleware(
