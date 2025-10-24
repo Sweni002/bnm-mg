@@ -12,7 +12,7 @@ from app.api import (
 from app.utils.response import success_response, error_response
 from app.utils.auth import decode_access_token
 from fastapi.responses import JSONResponse
-
+from app.models import *
 # Création des tables
 Base.metadata.create_all(bind=engine)
 
